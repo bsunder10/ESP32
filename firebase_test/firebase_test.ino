@@ -13,6 +13,9 @@
 #define API_KEY "AIzaSyA3ASRUnPKruHAMPFCu7o0vs6G8DalnrAI"
 #define DATABASE_URL "https://esp32-test-f01c5-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
+// Json files
+FirebaseJson test_json;
+
 // OBJECTS FOR FIREBASE
 FirebaseData fbdo;
 FirebaseAuth auth;
@@ -43,7 +46,6 @@ void firebase_init(){
   if (Firebase.signUp(&config, &auth, "", "")){
     Serial.println("Success");
     isAuthenticated = true;
-    databasePath = "/a";
     fuid = auth.token.uid.c_str();
   }else{
     Serial.printf("Failed, %s \n", config.signer.signupError.message.c_str());
@@ -62,11 +64,22 @@ void setup() {
   WiFi_init();
   firebase_init();
 
-  String node = databasePath + "/value";
-  if(Firebase.set(fbdo, node.c_str(), "Hello")){
+  test_json.add("test1", "test1");
+  test_json.add("test2", "test2");
+  test_json.add("test3", "test3");
+  
+  String test_node = databasePath + "/test";
+  if(Firebase.set(fbdo, test_node.c_str(), test_json)){
     Serial.println("passed");
   }else{
     Serial.println("failed");
+  }
+
+
+  FirebaseData fbdo;
+  if (Firebase.getString(fbdo, "/test/test1")){
+    String json = fbdo.to<const char *>();
+    Serial.println(json);
   }
 }
 
